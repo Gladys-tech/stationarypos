@@ -1,0 +1,61 @@
+STAPOS DESKTOP APP - EXPORT INSTRUCTIONS
+==========================================
+
+To get your complete desktop application:
+
+1. DOWNLOAD ALL FILES:
+   - Copy all the code files I provided in the previous response
+   - Create the exact folder structure as shown
+   - Make sure all dependencies are included
+
+2. REQUIRED FILES TO CREATE:
+   
+   A. Main Electron Files:
+   - electron/main.js (Main process - window management, menus)
+   - electron/preload.js (Security bridge between main and renderer)
+   
+   B. React Integration:
+   - src/hooks/useElectron.tsx (Electron integration hook)
+   - src/components/Layout/ElectronTitleBar.tsx (Desktop title bar)
+   - src/lib/database.ts (Local IndexedDB database)
+   - src/lib/offlineSupabase.ts (Offline database wrapper)
+   
+   C. Configuration Files:
+   - package.json (Updated with Electron dependencies)
+   - electron-builder.json (Build configuration)
+   - vite.config.ts (Updated for Electron builds)
+   
+   D. Assets:
+   - electron/assets/icon.png (512x512 app icon)
+   - electron/assets/icon.ico (Windows icon)
+   - electron/assets/icon.icns (macOS icon)
+
+3. SETUP PROCESS:
+   ```bash
+   # Install dependencies
+   npm install
+   
+   # Run in development
+   npm run electron-dev
+   
+   # Build for production
+   npm run electron-build
+   
+   # Create distribution packages
+   npm run dist
+   ```
+
+4. WHAT YOU GET:
+   - Complete offline POS system
+   - Native desktop application
+   - All original web features
+   - Local database storage
+   - Cross-platform support
+   - Professional installers
+
+5. PLATFORMS SUPPORTED:
+   - Windows (NSIS installer)
+   - macOS (DMG file)
+   - Linux (AppImage + DEB)
+
+The desktop app will have the exact same design and functionality as your web app, but running natively on desktop with full offline capabilities.
