@@ -13,6 +13,7 @@ import Expenses from './pages/Expenses';
 import AddCashier from './pages/AddCashier';
 import Reports from './pages/Reports';
 import Profits from './pages/Profits';
+import OfflineIndicator from './components/ui/OfflineIndicator';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 
 // Route component that checks for admin role
@@ -32,6 +33,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <OfflineIndicator />
         <Routes>
           {/* Public routes */}
           <Route path="/login" element={

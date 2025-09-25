@@ -1,13 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
+import { offlineSupabase } from './offlineSupabase';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
+// Use offline supabase for desktop app, online for web
+const isElectron = typeof window !== 'undefined' && window.electronAPI?.isElectron;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = isElectron 
+  ? offlineSupabase 
+  : (supabaseUrl && supabaseAnonKey) 
+    ? createClient(supabaseUrl, supabaseAnonKey)
+    : offlineSupabase; // Fallback to offline if no credentials
 
 // Database types
 export interface UserProfile {
