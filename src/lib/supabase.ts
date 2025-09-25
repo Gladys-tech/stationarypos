@@ -5,7 +5,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Use offline supabase for desktop app, online for web
-const isElectron = typeof window !== 'undefined' && window.electronAPI?.isElectron;
+const isElectron = typeof window !== 'undefined' && (window as any).electronAPI?.isElectron;
 
 export const supabase = isElectron 
   ? offlineSupabase 
