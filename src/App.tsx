@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import Layout from './components/Layout/Layout';
-import OfflineIndicator from './components/ui/OfflineIndicator';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
@@ -14,7 +13,6 @@ import Expenses from './pages/Expenses';
 import AddCashier from './pages/AddCashier';
 import Reports from './pages/Reports';
 import Profits from './pages/Profits';
-import OfflineIndicator from './components/ui/OfflineIndicator';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 
 // Route component that checks for admin role
@@ -34,8 +32,6 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <OfflineIndicator />
-        <OfflineIndicator />
         <Routes>
           {/* Public routes */}
           <Route path="/login" element={

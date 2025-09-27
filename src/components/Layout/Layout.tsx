@@ -1,8 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import Navbar from './Navbar';
-import ElectronTitleBar from './ElectronTitleBar';
 import ElectronTitleBar from './ElectronTitleBar';
 import LoadingSpinner from '../ui/LoadingSpinner';
 
@@ -37,7 +35,6 @@ const Layout: React.FC<LayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <ElectronTitleBar />
       <ElectronTitleBar />
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
