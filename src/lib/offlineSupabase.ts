@@ -100,10 +100,28 @@ class OfflineSupabase {
       
       // Save locally
       await localDB.put(table, data);
-      return { data: [data], error: null };
+      
+      // Return an object that mimics Supabase's chainable API
+      return {
+        data: [data], 
+        error: null,
+        select: (columns = '*') => ({
+          single: () => Promise.resolve({ data: data, error: null }),
+          then: (callback: any) => Promise.resolve({ data: [data], error: null }).then(callback)
+        }),
+        single: () => Promise.resolve({ data: data, error: null })
+      };
     } catch (error) {
       console.error('Insert error:', error);
-      return { data: null, error };
+      return {
+        data: null, 
+        error,
+        select: (columns = '*') => ({
+          single: () => Promise.resolve({ data: null, error }),
+          then: (callback: any) => Promise.resolve({ data: null, error }).then(callback)
+        }),
+        single: () => Promise.resolve({ data: null, error })
+      };
     }
   }
 
