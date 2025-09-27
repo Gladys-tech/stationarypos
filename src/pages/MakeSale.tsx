@@ -469,20 +469,22 @@ const MakeSale: React.FC = () => {
             </div>
 
             <Button
-              onClick={() => setShowReceipt(false)}
+              onClick={() => {
+                window.print();
+                setShowReceipt(false);
+              }}
               className="w-full mt-6"
             >
-            Print Receipt
+              Print Receipt
+            </Button>
+            <Button
+              onClick={() => setShowReceipt(false)}
+              variant="outline"
+              className="w-full mt-2"
+            >
+              Close
             </Button>
           </div>
-          <Button
-            onClick={() => {
-              window.print();
-              setShowReceipt(false);
-            }}
-            variant="outline"
-            className="w-full mt-2"
-          >
         </div>
       )}
     </div>
