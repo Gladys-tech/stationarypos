@@ -1,6 +1,42 @@
 // Offline-compatible Supabase wrapper
 import { localDB } from './database';
 
+// Define interfaces that match Supabase's API structure
+interface OfflineQueryBuilder {
+  select: (columns?: string) => OfflineSelectBuilder;
+  insert: (data: any) => OfflineInsertBuilder;
+  update: (data: any) => OfflineUpdateBuilder;
+  delete: () => OfflineDeleteBuilder;
+}
+
+interface OfflineSelectBuilder {
+  eq: (column: string, value: any) => Promise<{ data: any[] | null; error: any }>;
+  order: (column: string, options?: any) => Promise<{ data: any[] | null; error: any }>;
+  gte: (column: string, value: any) => Promise<{ data: any[] | null; error: any }>;
+  lt: (column: string, value: any) => Promise<{ data: any[] | null; error: any }>;
+  in: (column: string, values: any[]) => Promise<{ data: any[] | null; error: any }>;
+  single: () => Promise<{ data: any | null; error: any }>;
+  then: (callback: any) => Promise<any>;
+}
+
+interface OfflineInsertBuilder {
+  select: (columns?: string) => OfflineInsertSelectBuilder;
+  single: () => Promise<{ data: any | null; error: any }>;
+}
+
+interface OfflineInsertSelectBuilder {
+  single: () => Promise<{ data: any | null; error: any }>;
+  then: (callback: any) => Promise<any>;
+}
+
+interface OfflineUpdateBuilder {
+  eq: (column: string, value: any) => Promise<{ data: any | null; error: any }>;
+}
+
+interface OfflineDeleteBuilder {
+  eq: (column: string, value: any) => Promise<{ data: any | null; error: any }>;
+}
+
 class OfflineSupabase {
   private isOnline = navigator.onLine;
 
@@ -17,23 +53,46 @@ class OfflineSupabase {
   }
 
   // Generic method to handle database operations
-  from(table: string) {
+  from(table: string): OfflineQueryBuilder {
+    return {
+      select: (columns = '*') => this.createSelectBuilder(table, columns),
+      insert: (data: any) => this.createInsertBuilder(table, data),
+      update: (data: any) => this.createUpdateBuilder(table, data),
+      delete: () => this.createDeleteBuilder(table)
+    };
+  }
+
+  private createSelectBuilder(table: string, columns: string): OfflineSelectBuilder {
+    return {
+      eq: (column: string, value: any) => this.handleSelect(table, columns, { [column]: value }),
+      order: (column: string, options?: any) => this.handleSelect(table, columns, null, { column, ...options }),
+      gte: (column: string, value: any) => this.handleSelect(table, columns, { [`${column}_gte`]: value }),
+      lt: (column: string, value: any) => this.handleSelect(table, columns, { [`${column}_lt`]: value }),
+      in: (column: string, values: any[]) => this.handleSelect(table, columns, { [`${column}_in`]: values }),
+      single: () => this.handleSelectSingle(table, columns),
+      then: (callback: any) => this.handleSelect(table, columns).then(callback)
+    };
+  }
+
+  private createInsertBuilder(table: string, data: any): OfflineInsertBuilder {
     return {
       select: (columns = '*') => ({
-        eq: (column: string, value: any) => this.handleSelect(table, columns, { [column]: value }),
-        order: (column: string, options?: any) => this.handleSelect(table, columns, null, { column, ...options }),
-        gte: (column: string, value: any) => this.handleSelect(table, columns, { [`${column}_gte`]: value }),
-        lt: (column: string, value: any) => this.handleSelect(table, columns, { [`${column}_lt`]: value }),
-        single: () => this.handleSelectSingle(table, columns),
-        then: (callback: any) => this.handleSelect(table, columns).then(callback)
+        single: () => this.handleInsertWithSelect(table, data, columns, true),
+        then: (callback: any) => this.handleInsertWithSelect(table, data, columns, false).then(callback)
       }),
-      insert: (data: any) => this.handleInsert(table, data),
-      update: (data: any) => ({
-        eq: (column: string, value: any) => this.handleUpdate(table, data, { [column]: value })
-      }),
-      delete: () => ({
-        eq: (column: string, value: any) => this.handleDelete(table, { [column]: value })
-      })
+      single: () => this.handleInsertWithSelect(table, data, '*', true)
+    };
+  }
+
+  private createUpdateBuilder(table: string, data: any): OfflineUpdateBuilder {
+    return {
+      eq: (column: string, value: any) => this.handleUpdate(table, data, { [column]: value })
+    };
+  }
+
+  private createDeleteBuilder(table: string): OfflineDeleteBuilder {
+    return {
+      eq: (column: string, value: any) => this.handleDelete(table, { [column]: value })
     };
   }
 
@@ -52,6 +111,9 @@ class OfflineSupabase {
             } else if (key.endsWith('_lt')) {
               const field = key.replace('_lt', '');
               return new Date(item[field]) < new Date(value as string);
+            } else if (key.endsWith('_in')) {
+              const field = key.replace('_in', '');
+              return (value as any[]).includes(item[field]);
             } else {
               return item[key] === value;
             }
@@ -74,7 +136,7 @@ class OfflineSupabase {
       return { data, error: null };
     } catch (error) {
       console.error('Database error:', error);
-      return { data: [], error };
+      return { data: null, error };
     }
   }
 
@@ -86,7 +148,7 @@ class OfflineSupabase {
     };
   }
 
-  private async handleInsert(table: string, data: any) {
+  private async handleInsertWithSelect(table: string, data: any, columns: string, single: boolean) {
     try {
       // Add ID if not present
       if (!data.id) {
@@ -101,26 +163,15 @@ class OfflineSupabase {
       // Save locally
       await localDB.put(table, data);
       
-      // Return an object that mimics Supabase's chainable API
       return {
-        data: [data], 
-        error: null,
-        select: (columns = '*') => ({
-          single: () => Promise.resolve({ data: data, error: null }),
-          then: (callback: any) => Promise.resolve({ data: [data], error: null }).then(callback)
-        }),
-        single: () => Promise.resolve({ data: data, error: null })
+        data: single ? data : [data],
+        error: null
       };
     } catch (error) {
       console.error('Insert error:', error);
       return {
-        data: null, 
-        error,
-        select: (columns = '*') => ({
-          single: () => Promise.resolve({ data: null, error }),
-          then: (callback: any) => Promise.resolve({ data: null, error }).then(callback)
-        }),
-        single: () => Promise.resolve({ data: null, error })
+        data: null,
+        error
       };
     }
   }
