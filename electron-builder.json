@@ -52,7 +52,10 @@
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
-    "createStartMenuShortcut": true
+    "createStartMenuShortcut": true,
+    "runAfterFinish": false
   },
-  "publish": null
+  "publish": null,
+  "compression": "normal",
+  "forceCodeSigning": false
 }

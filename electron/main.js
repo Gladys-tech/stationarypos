@@ -1,5 +1,10 @@
-const { app, BrowserWindow, Menu, ipcMain, dialog, shell } = require('electron');
-const path = require('path');
+import { app, BrowserWindow, Menu, ipcMain, dialog, shell } from 'electron';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const isDev = process.env.NODE_ENV === 'development';
 
 // Keep a global reference of the window object
@@ -16,9 +21,9 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       enableRemoteModule: false,
-      preload: path.join(__dirname, 'preload.js')
+      preload: join(__dirname, 'preload.js')
     },
-    icon: path.join(__dirname, 'assets', 'icon.png'),
+    icon: join(__dirname, 'assets', 'icon.png'),
     show: false,
     titleBarStyle: 'default',
     autoHideMenuBar: false
@@ -27,7 +32,7 @@ function createWindow() {
   // Load the app
   const startUrl = isDev 
     ? 'http://localhost:5173' 
-    : `file://${path.join(__dirname, '../dist/index.html')}`;
+    : `file://${join(__dirname, '../dist/index.html')}`;
   
   mainWindow.loadURL(startUrl);
 

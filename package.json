@@ -2,7 +2,8 @@
   "name": "vite-react-typescript-starter",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "description": "StaPOS - Complete Point of Sale System for Stationary Stores",
+  "author": "Your Name <your.email@example.com>",
   "scripts": {
     "dev": "vite",
     "electron": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron electron/main.js\"",
