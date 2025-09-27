@@ -483,10 +483,7 @@ const MakeSale: React.FC = () => {
             variant="outline"
             className="w-full mt-2"
           >
-            Close
-          </Button>
         </div>
-        )}
       )}
     </div>
   );
