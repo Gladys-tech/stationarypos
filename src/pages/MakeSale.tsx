@@ -486,6 +486,7 @@ const MakeSale: React.FC = () => {
             </Button>
           </div>
       )}
+      )}
     </div>
   );
 };
